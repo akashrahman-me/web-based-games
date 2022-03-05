@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>Document</title>
+	<style type="text/css">
+		canvas {background: #333; margin: auto; display: block}
+		body {margin:0;}
+	</style>
+</head>
+<body>
+	<canvas width="800" height="500"></canvas>
+
+	
+	<script>
+		let canvas = document.getElementsByTagName('canvas')[0]
+		let ctx = canvas.getContext('2d')
+		let dir, score, bolls, food, boll, key
+		let bollSize = 19
+		init()
+		
+		
+		function init() {
+			dir = 'right'
+			score = 0
+			bolls = [
+				{x: 40, y: 40},
+				{x: 60, y: 40},
+				{x: 80, y: 40},
+			]
+			createFood()
+		}
+
+		document.addEventListener('keydown', function(e) {
+			key = e.code
+			if (key == 'ArrowUp' && dir != 'down') dir = 'up'
+			if (key == 'ArrowDown' && dir != 'up') dir = 'down'
+			if (key == 'ArrowLeft' && dir != 'right') dir = 'left'
+			if (key == 'ArrowRight' && dir != 'left') dir = 'right'
+		})
+
+		function add() {
+			let lastBoll = bolls[bolls.length -1]
+
+			if (dir == 'up') bolls.push({x: lastBoll.x, y: lastBoll.y - 20})
+			if (dir == 'down') bolls.push({x: lastBoll.x, y: lastBoll.y + 20})
+			if (dir == 'left') bolls.push({x: lastBoll.x - 20, y: lastBoll.y})
+			if (dir == 'right') bolls.push({x: lastBoll.x + 20, y: lastBoll.y})
+
+		}
+
+		function createFood() {
+			food = {
+				x: Math.floor(Math.random() * 39) ,
+				y: Math.floor(Math.random() * 24)
+			}
+		}
+
+		function ani() {
+			ctx.clearRect(0, 0, canvas.width, canvas.height)
+			bolls.shift()
+			add()
+
+			if (food.x * 20 == bolls[bolls.length - 1].x && food.y * 20 == bolls[bolls.length - 1].y) {
+				score += 5
+				add()
+				createFood()
+			}
+			
+
+			for(let i = 0; i < bolls.length; i++) {
+				boll = bolls[i]
+
+				bolls.length - 1 === i ? ctx.fillStyle = "red" : ctx.fillStyle = "green"
+
+
+				if (dir === 'right' && boll.x === canvas.width) boll.x = 0
+				if (dir === 'left' && boll.x === -20) boll.x = canvas.width
+				if (dir === 'down' && boll.y === canvas.height) boll.y = 0
+				if (dir === 'up' && boll.y === -20) boll.y = canvas.height
+
+
+				let lastBoll = bolls[bolls.length -1]
+
+				if (boll.x === lastBoll.x && boll.y === lastBoll.y && i < bolls.length - 2) {
+					alert('Game over, Score: ' + score)
+					init()
+				}
+
+				ctx.fillRect(boll.x, boll.y, bollSize, bollSize)
+				ctx.fillRect(food.x * 20, food.y * 20 , bollSize, bollSize)
+			}
+			ctx.fillStyle = 'white'
+			ctx.font = '30px sens-serif green'
+			ctx.fillText(`Score: ${score}`, 630, 460)
+
+		}
+
+		setInterval(ani, 156)
+	</script>
+</body>
+</html>
